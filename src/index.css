@@ -6,3 +6,6 @@ body {
   margin: 0;
   padding: 0;
 }
+/* Global horror theme overrides */
+body { background: #000; color: #fff; }
+.white-text, .white-text * { color: #ffffff !important; }
