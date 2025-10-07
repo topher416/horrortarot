@@ -4,6 +4,28 @@ import { Shuffle, Eye, Star, Calendar, Skull, Moon, Ghost, Crown, Sparkles, Musi
 import * as Tone from 'tone';
 import './custom.css';
 
+const CHORD_POOL = [
+  ['D2', 'F2', 'A2'],
+  ['A1', 'C2', 'E2'],
+  ['G1', 'Bb1', 'D2'],
+  ['F1', 'Ab1', 'C2'],
+  ['Bb1', 'Db2', 'F2'],
+  ['C2', 'Eb2', 'G2'],
+  ['E1', 'G1', 'B1'],
+  ['D1', 'F1', 'A1'],
+];
+
+const ARP_POOL = [
+  ['D3', 'F4', 'A5', 'F3', 'D4', 'A4', 'F5', 'A3', 'D5', 'F4', 'A4', 'D4'],
+  ['A2', 'C4', 'E5', 'C3', 'A4', 'E4', 'C5', 'E3', 'A5', 'C4', 'E4', 'A3'],
+  ['G3', 'Bb4', 'D5', 'Bb3', 'G4', 'D4', 'Bb5', 'D3', 'G5', 'Bb4', 'D4', 'G3'],
+  ['F2', 'Ab4', 'C5', 'Ab3', 'F4', 'C4', 'Ab5', 'C3', 'F5', 'Ab4', 'C4', 'F3'],
+  ['Bb3', 'Db5', 'F5', 'Db4', 'Bb4', 'F4', 'Db6', 'F3', 'Bb5', 'Db4', 'F4', 'Bb3'],
+  ['C3', 'Eb4', 'G5', 'Eb3', 'C4', 'G4', 'Eb5', 'G3', 'C5', 'Eb4', 'G4', 'C4'],
+  ['E3', 'G4', 'B5', 'G3', 'E4', 'B4', 'G5', 'B3', 'E5', 'G4', 'B4', 'E3'],
+  ['D2', 'F4', 'A5', 'F3', 'D4', 'A4', 'F5', 'A3', 'D5', 'F4', 'A3', 'D3'],
+];
+
 const HorrorMovieTarot = () => {
   const [horrorMovies, setHorrorMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -135,39 +157,15 @@ const HorrorMovieTarot = () => {
       }
     };
 
-    // All chords down one octave for darker, more haunting sound
-    const chordPool = [
-      ['D2', 'F2', 'A2'],
-      ['A1', 'C2', 'E2'],
-      ['G1', 'Bb1', 'D2'],
-      ['F1', 'Ab1', 'C2'],
-      ['Bb1', 'Db2', 'F2'],
-      ['C2', 'Eb2', 'G2'],
-      ['E1', 'G1', 'B1'],
-      ['D1', 'F1', 'A1'],
-    ];
-
-    // Arpeggio patterns - spanning multiple octaves for variety
-    const arpPool = [
-      ['D3', 'F4', 'A5', 'F3', 'D4', 'A4', 'F5', 'A3', 'D5', 'F4', 'A4', 'D4'],
-      ['A2', 'C4', 'E5', 'C3', 'A4', 'E4', 'C5', 'E3', 'A5', 'C4', 'E4', 'A3'],
-      ['G3', 'Bb4', 'D5', 'Bb3', 'G4', 'D4', 'Bb5', 'D3', 'G5', 'Bb4', 'D4', 'G3'],
-      ['F2', 'Ab4', 'C5', 'Ab3', 'F4', 'C4', 'Ab5', 'C3', 'F5', 'Ab4', 'C4', 'F3'],
-      ['Bb3', 'Db5', 'F5', 'Db4', 'Bb4', 'F4', 'Db6', 'F3', 'Bb5', 'Db4', 'F4', 'Bb3'],
-      ['C3', 'Eb4', 'G5', 'Eb3', 'C4', 'G4', 'Eb5', 'G3', 'C5', 'Eb4', 'G4', 'C4'],
-      ['E3', 'G4', 'B5', 'G3', 'E4', 'B4', 'G5', 'B3', 'E5', 'G4', 'B4', 'E3'],
-      ['D2', 'F4', 'A5', 'F3', 'D4', 'A4', 'F5', 'A3', 'D5', 'F4', 'A3', 'D3'],
-    ];
-
     const playChords = () => {
       console.log('[Audio] playChords called, isPlayingRef:', isPlayingRef.current);
 
       // Randomize chord order
-      const shuffledIndices = [...Array(chordPool.length).keys()].sort(() => Math.random() - 0.5);
+      const shuffledIndices = [...Array(CHORD_POOL.length).keys()].sort(() => Math.random() - 0.5);
 
       shuffledIndices.forEach((chordIdx, i) => {
-        const chord = chordPool[chordIdx];
-        const arp = arpPool[chordIdx];
+        const chord = CHORD_POOL[chordIdx];
+        const arp = ARP_POOL[chordIdx];
 
         // Play chord
         const id = setTimeout(() => {
