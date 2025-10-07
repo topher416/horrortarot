@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import './LiquidEther.css';
 
@@ -29,6 +29,60 @@ export default function LiquidEther({
   const rafRef = useRef(null);
   const intersectionObserverRef = useRef(null);
   const isVisibleRef = useRef(true);
+
+  const updateSimulationOptions = useCallback(() => {
+    const webgl = webglRef.current;
+    if (!webgl) return;
+    const sim = webgl.output?.simulation;
+    if (!sim) return;
+    
+    const prevRes = sim.options.resolution;
+    Object.assign(sim.options, {
+      mouse_force: mouseForce,
+      cursor_size: cursorSize,
+      isViscous,
+      viscous,
+      iterations_viscous: iterationsViscous,
+      iterations_poisson: iterationsPoisson,
+      dt,
+      BFECC,
+      resolution,
+      isBounce
+    });
+    
+    if (webgl.autoDriver) {
+      webgl.autoDriver.enabled = autoDemo;
+      webgl.autoDriver.speed = autoSpeed;
+      webgl.autoDriver.resumeDelay = autoResumeDelay;
+      webgl.autoDriver.rampDurationMs = autoRampDuration * 1000;
+      if (webgl.autoDriver.mouse) {
+        webgl.autoDriver.mouse.autoIntensity = autoIntensity;
+        webgl.autoDriver.mouse.takeoverDuration = takeoverDuration;
+      }
+    }
+    
+    if (resolution !== prevRes) {
+      sim.resize();
+    }
+  }, [
+    mouseForce,
+    cursorSize,
+    isViscous,
+    viscous,
+    iterationsViscous,
+    iterationsPoisson,
+    dt,
+    BFECC,
+    resolution,
+    isBounce,
+    autoDemo,
+    autoSpeed,
+    autoIntensity,
+    takeoverDuration,
+    autoResumeDelay,
+    autoRampDuration
+  ]);
+
   const resizeRafRef = useRef(null);
 
   useEffect(() => {
@@ -995,28 +1049,7 @@ export default function LiquidEther({
     });
     webglRef.current = webgl;
 
-    const applyOptionsFromProps = () => {
-      if (!webglRef.current) return;
-      const sim = webglRef.current.output?.simulation;
-      if (!sim) return;
-      const prevRes = sim.options.resolution;
-      Object.assign(sim.options, {
-        mouse_force: mouseForce,
-        cursor_size: cursorSize,
-        isViscous,
-        viscous,
-        iterations_viscous: iterationsViscous,
-        iterations_poisson: iterationsPoisson,
-        dt,
-        BFECC,
-        resolution,
-        isBounce
-      });
-      if (resolution !== prevRes) {
-        sim.resize();
-      }
-    };
-    applyOptionsFromProps();
+    updateSimulationOptions();
 
     webgl.start();
 
@@ -1091,54 +1124,8 @@ export default function LiquidEther({
   ]);
 
   useEffect(() => {
-    const webgl = webglRef.current;
-    if (!webgl) return;
-    const sim = webgl.output?.simulation;
-    if (!sim) return;
-    const prevRes = sim.options.resolution;
-    Object.assign(sim.options, {
-      mouse_force: mouseForce,
-      cursor_size: cursorSize,
-      isViscous,
-      viscous,
-      iterations_viscous: iterationsViscous,
-      iterations_poisson: iterationsPoisson,
-      dt,
-      BFECC,
-      resolution,
-      isBounce
-    });
-    if (webgl.autoDriver) {
-      webgl.autoDriver.enabled = autoDemo;
-      webgl.autoDriver.speed = autoSpeed;
-      webgl.autoDriver.resumeDelay = autoResumeDelay;
-      webgl.autoDriver.rampDurationMs = autoRampDuration * 1000;
-      if (webgl.autoDriver.mouse) {
-        webgl.autoDriver.mouse.autoIntensity = autoIntensity;
-        webgl.autoDriver.mouse.takeoverDuration = takeoverDuration;
-      }
-    }
-    if (resolution !== prevRes) {
-      sim.resize();
-    }
-  }, [
-    mouseForce,
-    cursorSize,
-    isViscous,
-    viscous,
-    iterationsViscous,
-    iterationsPoisson,
-    dt,
-    BFECC,
-    resolution,
-    isBounce,
-    autoDemo,
-    autoSpeed,
-    autoIntensity,
-    takeoverDuration,
-    autoResumeDelay,
-    autoRampDuration
-  ]);
+    updateSimulationOptions();
+  }, [updateSimulationOptions]);
 
   return <div ref={mountRef} className={`liquid-ether-container ${className || ''}`} style={style} />;
 }
